@@ -6,7 +6,7 @@ import lombok.Data;
 public class HabitDto {
 
 	private int habitIdx;
-	private String habitContents;
+	private String habitContent;
 	private String registDt;
 	private String deleteYn;
 	

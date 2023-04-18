@@ -13,7 +13,7 @@
 	</select>
 	
 	<!-- 습관 추가 -->
-	<insert id="addHabit" parameterType="habitTracker.dto.HabitDto" resultType="INTEGER">
+	<insert id="addHabit" parameterType="habitTracker.dto.HabitDto">
 	INSERT INTO t_habit (habit_content, regist_dt, delete_yn)
 	     VALUES (#{habitContent}, now(), 'N')
 	</insert>
@@ -41,16 +41,17 @@
 	</select>
 	
 	<!-- 습관 실행 여부 체크 -->
-	<insert id="checkHabit" parameterType="habitTracker.dto.HabitHistoryDto" resultType="habitTracker.dto.HabitHistoryDto">
+	<insert id="checkHabit" parameterType="habitTracker.dto.HabitHistoryDto">
 	INSERT INTO t_habit_history (habit_idx, done_dt)
 	     VALUES (#{habitIdx}, DATE_FORMAT(now(), '%Y-%m-%d'))
 	</insert>
 	
 	<!-- 월별 습관 목록 조회 -->
-	<select id="openHabitList" resultType="habitTracker.dto.HabitDto">
+	<select id="openHabitListByMonth" resultType="habitTracker.dto.HabitDto">
 	SELECT habit_idx, habit_content, DATE_FORMAT(regist_dt, '%Y-%m-%d') as regist_dt
 	  FROM t_habit
 	 WHERE delete_yn = 'N'
 	   AND DATE_FORMAT(regist_dt, '%Y-%m') = DATE_FORMAT(#{registDt}, '%Y-%m')
   ORDER BY regist_dt desc
+  	</select>
 </mapper>
