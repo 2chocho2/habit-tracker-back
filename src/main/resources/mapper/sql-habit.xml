@@ -7,9 +7,7 @@
 	<select id="openHabitList" resultType="habitTracker.dto.HabitDto">
 	SELECT habit_idx, habit_content, DATE_FORMAT(regist_dt, '%Y-%m-%d') as regist_dt
 	  FROM t_habit
-	 WHERE delete_yn = 'N'
-	   AND DATE_FORMAT(regist_dt, '%Y-%m') = DATE_FORMAT(now(), '%Y-%m')
-  ORDER BY regist_dt desc
+	 WHERE DATE_FORMAT(regist_dt, '%Y%m') = #{registDt}
 	</select>
 	
 	<!-- 습관 추가 -->
@@ -40,18 +38,43 @@
 	   AND habit_idx = #{habitIdx}
 	</select>
 	
-	<!-- 습관 실행 여부 체크 -->
-	<insert id="checkHabit" parameterType="habitTracker.dto.HabitHistoryDto">
-	INSERT INTO t_habit_history (habit_idx, done_dt)
-	     VALUES (#{habitIdx}, DATE_FORMAT(now(), '%Y-%m-%d'))
-	</insert>
+	<select id="openHabitHistory" resultType="habitTracker.dto.HabitHistoryDto">
+	SELECT habit_idx, done_dt, done_yn
+	  FROM t_habit_history
+	 WHERE habit_idx = #{habitIdx}
+	</select>
 	
-	<!-- 습관 실행 여부 체크 해제 -->
+	<!-- 습관 실행 여부 체크 
+	<insert id="checkHabit" parameterType="habitTracker.dto.HabitHistoryDto">
+	INSERT INTO t_habit_history (habit_idx, done_dt, done_yn)
+	     VALUES (#{habitIdx}, DATE_FORMAT(#{done_dt}, '%Y-%m-%d'))
+	</insert>-->
+	
+	<!-- 습관 실행 여부 체크 -->
+	<update id="checkHabit" parameterType="habitTracker.dto.HabitHistoryDto">
+	  UPDATE t_habit_history
+	  SET done_yn = CASE
+	                  WHEN done_yn = '1' THEN '0'
+	                  WHEN done_yn = '0' THEN '1'
+	                END
+	  WHERE habit_idx = #{habitIdx}
+	    AND DATE_FORMAT(done_dt, '%Y-%m-%d') = #{doneDt}
+	</update>
+	
+	<!-- 습관 실행 여부 체크 해제 
 	<delete id="unCheckHabit" parameterType="habitTracker.dto.HabitHistoryDto">
 	 DELETE FROM t_habit_history
 	  WHERE habit_idx = #{habitIdx}
 	    AND done_dt = DATE_FORMAT(#{doneDt}, '%Y-%m-%d'))
-	</delete>
+	</delete>-->
+	
+	<!-- 습관 실행 여부 체크 해제 
+	<update id="unCheckHabit" parameterType="habitTracker.dto.HabitHistoryDto">
+	 UPDATE t_habit_history
+	    SET done_yn = '0'
+	  WHERE habit_idx = #{habitIdx}
+	    AND DATE_FORMAT(done_dt, '%Y-%m-%d') = #{doneDt}
+	</update>-->
 	
 	<!-- 월별 습관 목록 조회 -->
 	<select id="openHabitListByMonth" resultType="habitTracker.dto.HabitDto">

@@ -16,8 +16,8 @@ public class HabitTrackerServiceImpl implements HabitTrackerService {
 	HabitTrackerMapper habitTrackerMapper;
 	
 	// 습관 목록 조회
-	public List<HabitDto> openHabitList() throws Exception {
-		return habitTrackerMapper.openHabitList(); 
+	public List<HabitDto> openHabitList(String registDt) throws Exception {
+		return habitTrackerMapper.openHabitList(registDt); 
 	}
 
 	// 습관 추가
@@ -40,15 +40,18 @@ public class HabitTrackerServiceImpl implements HabitTrackerService {
 		return habitTrackerMapper.openHabitDetail(habitIdx);
 	}
 
+	public List<HabitHistoryDto> openHabitHistory(int habitIdx) throws Exception {
+		return habitTrackerMapper.openHabitHistory(habitIdx);
+	}
 	// 습관 실행 여부 체크
 	public int checkHabit(HabitHistoryDto habitHistoryDto) throws Exception {
 		return habitTrackerMapper.checkHabit(habitHistoryDto);
 	}
 	
 	// 습관 실행 여부 체크 해제
-	public int unCheckHabit(HabitHistoryDto habitHistoryDto) throws Exception {
-		return habitTrackerMapper.unCheckHabit(habitHistoryDto);
-	}
+	//	public int unCheckHabit(HabitHistoryDto habitHistoryDto) throws Exception {
+	//		return habitTrackerMapper.unCheckHabit(habitHistoryDto);
+	//	}
 
 	// 월 변경 후 목록 조회
 	public List<HabitDto> openHabitListByMonth(String registDt) throws Exception {

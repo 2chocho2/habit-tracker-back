@@ -8,7 +8,7 @@ import habitTracker.dto.HabitHistoryDto;
 public interface HabitTrackerService {
 
 	// 습관 목록 조회
-	public List<HabitDto> openHabitList() throws Exception;
+	public List<HabitDto> openHabitList(String registDt) throws Exception;
 	
 	// 습관 추가
 	public int addHabit(HabitDto habitDto) throws Exception;
@@ -21,12 +21,13 @@ public interface HabitTrackerService {
 	
 	// 습관 상제 페이지
 	public HabitDto openHabitDetail(int habitIdx) throws Exception;
+	public List<HabitHistoryDto> openHabitHistory(int habitIdx) throws Exception;
 	
 	// 습관 실행 여부 체크
 	public int checkHabit(HabitHistoryDto habitHistoryDto) throws Exception;
 	
 	// 습관 실행 여부 체크 해제
-	public int unCheckHabit(HabitHistoryDto habitHistoryDto) throws Exception;
+	//	public int unCheckHabit(HabitHistoryDto habitHistoryDto) throws Exception;
 	
 	// 월 변경 후 목록 조회
 	public List<HabitDto> openHabitListByMonth(String registDt) throws Exception;

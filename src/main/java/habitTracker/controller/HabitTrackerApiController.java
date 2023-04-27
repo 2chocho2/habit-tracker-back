@@ -1,6 +1,8 @@
 package habitTracker.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,14 +26,19 @@ public class HabitTrackerApiController {
 	HabitTrackerService habitTrackerService;
 	
 	// 습관 목록 조회
-	@GetMapping("/api/habit")
-	public ResponseEntity<List<HabitDto>> openHabitList() throws Exception {
-		List<HabitDto> list = habitTrackerService.openHabitList();
+	@GetMapping("/api/habit/date/{registDt}")
+	public ResponseEntity<Map<String, Object>> openHabitList(@PathVariable("registDt") String registDt) throws Exception {
+		Map<String, Object> result = new HashMap<>();
+		
+		List<HabitDto> list = habitTrackerService.openHabitList(registDt);
+		
+		result.put("list", list);
+		result.put("month", registDt);
 		
 		if(list != null) {
-			return ResponseEntity.status(HttpStatus.OK).body(list);
+			return ResponseEntity.status(HttpStatus.OK).body(result);
 		} else {
-			return ResponseEntity.status(HttpStatus.OK).body(list);
+			return ResponseEntity.status(HttpStatus.OK).body(result);
 		}
 	}
 	
@@ -76,11 +83,17 @@ public class HabitTrackerApiController {
 	
 	// 습관별 상세 페이지
 	@GetMapping("/api/habit/{habitIdx}")
-	public ResponseEntity<HabitDto> openHabitDetail(@PathVariable("habitIdx") int habitIdx) throws Exception {
-		HabitDto habitDto = habitTrackerService.openHabitDetail(habitIdx);
+	public ResponseEntity<Map<String, Object>> openHabitDetail(@PathVariable("habitIdx") int habitIdx) throws Exception {
+		Map<String, Object> result = new HashMap<>();
 		
-		if (habitDto != null) {
-			return ResponseEntity.status(HttpStatus.OK).body(habitDto);
+		HabitDto habitDto = habitTrackerService.openHabitDetail(habitIdx);
+		List<HabitHistoryDto> habitHistoryList = habitTrackerService.openHabitHistory(habitIdx);
+		
+		result.put("habitDto", habitDto);
+		result.put("habitHistoryList", habitHistoryList);
+		
+		if (habitDto != null && habitHistoryList != null) {
+			return ResponseEntity.status(HttpStatus.OK).body(result);
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
@@ -97,18 +110,18 @@ public class HabitTrackerApiController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(checkCount);
 		}
 	}
-	
-	@DeleteMapping("/api/habit/check")
-	public ResponseEntity<Integer> unCheckHabit(@RequestBody HabitHistoryDto habitHistorytDto) throws Exception {
-		int checkCount = habitTrackerService.unCheckHabit(habitHistorytDto);
-		
-		if (checkCount != 1) {
-			return ResponseEntity.status(HttpStatus.OK).body(checkCount);
-		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(checkCount);
-		}
-	}
-	
+//	
+//	@PostMapping("/api/habit/uncheck")
+//	public ResponseEntity<Integer> unCheckHabit(@RequestBody HabitHistoryDto habitHistorytDto) throws Exception {
+//		int checkCount = habitTrackerService.unCheckHabit(habitHistorytDto);
+//		
+//		if (checkCount != 1) {
+//			return ResponseEntity.status(HttpStatus.OK).body(checkCount);
+//		} else {
+//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(checkCount);
+//		}
+//	}
+//	
 	// 월 변경 후 목록 조회
 	@GetMapping("/api/habit/{registDt}")
 	public ResponseEntity<List<HabitDto>> openHabitListByMonth(@PathVariable("registDt") String registDt) throws Exception {
