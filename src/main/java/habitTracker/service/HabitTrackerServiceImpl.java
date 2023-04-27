@@ -44,6 +44,11 @@ public class HabitTrackerServiceImpl implements HabitTrackerService {
 	public int checkHabit(HabitHistoryDto habitHistoryDto) throws Exception {
 		return habitTrackerMapper.checkHabit(habitHistoryDto);
 	}
+	
+	// 습관 실행 여부 체크 해제
+	public int unCheckHabit(HabitHistoryDto habitHistoryDto) throws Exception {
+		return habitTrackerMapper.unCheckHabit(habitHistoryDto);
+	}
 
 	// 월 변경 후 목록 조회
 	public List<HabitDto> openHabitListByMonth(String registDt) throws Exception {

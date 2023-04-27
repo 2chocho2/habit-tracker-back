@@ -46,6 +46,13 @@
 	     VALUES (#{habitIdx}, DATE_FORMAT(now(), '%Y-%m-%d'))
 	</insert>
 	
+	<!-- 습관 실행 여부 체크 해제 -->
+	<delete id="unCheckHabit" parameterType="habitTracker.dto.HabitHistoryDto">
+	 DELETE FROM t_habit_history
+	  WHERE habit_idx = #{habitIdx}
+	    AND done_dt = DATE_FORMAT(#{doneDt}, '%Y-%m-%d'))
+	</delete>
+	
 	<!-- 월별 습관 목록 조회 -->
 	<select id="openHabitListByMonth" resultType="habitTracker.dto.HabitDto">
 	SELECT habit_idx, habit_content, DATE_FORMAT(regist_dt, '%Y-%m-%d') as regist_dt

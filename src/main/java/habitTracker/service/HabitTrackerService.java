@@ -25,6 +25,9 @@ public interface HabitTrackerService {
 	// 습관 실행 여부 체크
 	public int checkHabit(HabitHistoryDto habitHistoryDto) throws Exception;
 	
+	// 습관 실행 여부 체크 해제
+	public int unCheckHabit(HabitHistoryDto habitHistoryDto) throws Exception;
+	
 	// 월 변경 후 목록 조회
 	public List<HabitDto> openHabitListByMonth(String registDt) throws Exception;
 	

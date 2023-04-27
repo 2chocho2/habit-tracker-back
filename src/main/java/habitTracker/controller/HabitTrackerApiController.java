@@ -98,6 +98,17 @@ public class HabitTrackerApiController {
 		}
 	}
 	
+	@DeleteMapping("/api/habit/check")
+	public ResponseEntity<Integer> unCheckHabit(@RequestBody HabitHistoryDto habitHistorytDto) throws Exception {
+		int checkCount = habitTrackerService.unCheckHabit(habitHistorytDto);
+		
+		if (checkCount != 1) {
+			return ResponseEntity.status(HttpStatus.OK).body(checkCount);
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(checkCount);
+		}
+	}
+	
 	// 월 변경 후 목록 조회
 	@GetMapping("/api/habit/{registDt}")
 	public ResponseEntity<List<HabitDto>> openHabitListByMonth(@PathVariable("registDt") String registDt) throws Exception {
