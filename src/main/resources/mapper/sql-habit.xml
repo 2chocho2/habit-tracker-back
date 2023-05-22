@@ -7,7 +7,7 @@
 	<select id="openHabitList" resultType="habitTracker.dto.HabitDto">
 	SELECT habit_idx, habit_content, DATE_FORMAT(regist_dt, '%Y-%m-%d') as regist_dt
 	  FROM t_habit
-	 WHERE DATE_FORMAT(regist_dt, '%Y%m') = #{registDt}
+	 WHERE DATE_FORMAT(regist_dt, '%Y%m') = #{registDt} AND delete_yn != "Y"
 	</select>
 	
 	<!-- 습관 추가 -->
@@ -44,12 +44,6 @@
 	 WHERE habit_idx = #{habitIdx}
 	</select>
 	
-	<!-- 습관 실행 여부 체크 
-	<insert id="checkHabit" parameterType="habitTracker.dto.HabitHistoryDto">
-	INSERT INTO t_habit_history (habit_idx, done_dt, done_yn)
-	     VALUES (#{habitIdx}, DATE_FORMAT(#{done_dt}, '%Y-%m-%d'))
-	</insert>-->
-	
 	<!-- 습관 실행 여부 체크 -->
 	<update id="checkHabit" parameterType="habitTracker.dto.HabitHistoryDto">
 	  UPDATE t_habit_history
@@ -61,21 +55,36 @@
 	    AND DATE_FORMAT(done_dt, '%Y-%m-%d') = #{doneDt}
 	</update>
 	
-	<!-- 습관 실행 여부 체크 해제 
-	<delete id="unCheckHabit" parameterType="habitTracker.dto.HabitHistoryDto">
-	 DELETE FROM t_habit_history
-	  WHERE habit_idx = #{habitIdx}
-	    AND done_dt = DATE_FORMAT(#{doneDt}, '%Y-%m-%d'))
-	</delete>-->
 	
-	<!-- 습관 실행 여부 체크 해제 
-	<update id="unCheckHabit" parameterType="habitTracker.dto.HabitHistoryDto">
-	 UPDATE t_habit_history
-	    SET done_yn = '0'
-	  WHERE habit_idx = #{habitIdx}
-	    AND DATE_FORMAT(done_dt, '%Y-%m-%d') = #{doneDt}
-	</update>-->
+	<!-- 습관별 달성일 구하기 -->
+	<select id="habitTargetDays" parameterType="Integer" resultType="Integer">
+	  SELECT 
+	  	COUNT( case when done_yn = '1' THEN 1 END )
+	  FROM t_habit_history
+	  WHERE habit_idx= #{habitIdx}
+	</select>
 	
+	<!-- 습관별 달성률 구하기  -->
+	<select id="habitTargetDaysPercent" parameterType="Integer" resultType="Integer">
+	SELECT 
+	 ROUND(COUNT(case when habit_idx=#{habitIdx} and done_yn = '1' THEN 1 END )/COUNT(case when habit_idx=#{habitIdx} THEN 1 END) *100)
+	FROM t_habit_history	
+	</select>
+	
+	<!-- 하루 평균 달성률 구하기 -->
+	<select id="habitOneDayAvgPercent" resultType="habitTracker.dto.AveragePercentDto">
+	  SELECT
+	    d.distinct_day,
+	    ROUND(COUNT(case when DATE_FORMAT(t.done_dt, '%Y-%m-%d')=d.distinct_day and t.done_yn = '1' THEN 1 END)/COUNT(CASE WHEN DATE_FORMAT(t.done_dt, '%Y-%m-%d')=d.distinct_day THEN 1 END) * 100) as completion_rate
+	  FROM t_habit_history t
+	    INNER JOIN t_habit AS h ON t.habit_idx = h.habit_idx AND h.delete_yn = 'N'
+	    JOIN (
+	      SELECT DISTINCT DATE_FORMAT(done_dt, '%Y-%m-%d') AS distinct_day FROM t_habit_history WHERE DATE_FORMAT(done_dt, '%Y-%m') = DATE_FORMAT(#{registDt}, '%Y-%m')
+	    ) d ON DATE_FORMAT(t.done_dt, '%Y-%m-%d') = d.distinct_day
+	  GROUP BY
+	    d.distinct_day
+	</select>
+
 	<!-- 월별 습관 목록 조회 -->
 	<select id="openHabitListByMonth" resultType="habitTracker.dto.HabitDto">
 	SELECT habit_idx, habit_content, DATE_FORMAT(regist_dt, '%Y-%m-%d') as regist_dt

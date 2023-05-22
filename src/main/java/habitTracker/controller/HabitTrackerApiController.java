@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import habitTracker.dto.HabitDto;
 import habitTracker.dto.HabitHistoryDto;
+import habitTracker.dto.AveragePercentDto;
 import habitTracker.service.HabitTrackerService;
 
 @RestController
@@ -55,7 +56,7 @@ public class HabitTrackerApiController {
 	}
 	
 	// 습관 수정
-	@PutMapping("/api/habit/{habitIdx}")
+	@PutMapping("/api/habit/edit/{habitIdx}")
 	public ResponseEntity<Integer> editHabit(
 							@PathVariable("habitIdx") int habitIdx,
 							@RequestBody HabitDto habitDto) throws Exception {
@@ -70,7 +71,7 @@ public class HabitTrackerApiController {
 	}
 	
 	// 습관 삭제
-	@DeleteMapping("/api/habit/{habitIdx}")
+	@DeleteMapping("/api/habit/delete/{habitIdx}")
 	public ResponseEntity<Integer> deleteHabit(@PathVariable("habitIdx") int habitIdx) throws Exception {
 		int deleteCount = habitTrackerService.deleteHabit(habitIdx);
 		
@@ -82,15 +83,20 @@ public class HabitTrackerApiController {
 	}
 	
 	// 습관별 상세 페이지
-	@GetMapping("/api/habit/{habitIdx}")
+	@GetMapping("/api/habit/detail/{habitIdx}")
 	public ResponseEntity<Map<String, Object>> openHabitDetail(@PathVariable("habitIdx") int habitIdx) throws Exception {
 		Map<String, Object> result = new HashMap<>();
 		
 		HabitDto habitDto = habitTrackerService.openHabitDetail(habitIdx);
 		List<HabitHistoryDto> habitHistoryList = habitTrackerService.openHabitHistory(habitIdx);
+		int count = habitTrackerService.habitTargetDays(habitIdx);
+		int percent = habitTrackerService.habitTargetDaysPercent(habitIdx);
 		
+		result.put("registDt", habitDto.getRegistDt());
 		result.put("habitDto", habitDto);
 		result.put("habitHistoryList", habitHistoryList);
+		result.put("count", count);
+		result.put("percent", percent);
 		
 		if (habitDto != null && habitHistoryList != null) {
 			return ResponseEntity.status(HttpStatus.OK).body(result);
@@ -110,18 +116,7 @@ public class HabitTrackerApiController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(checkCount);
 		}
 	}
-//	
-//	@PostMapping("/api/habit/uncheck")
-//	public ResponseEntity<Integer> unCheckHabit(@RequestBody HabitHistoryDto habitHistorytDto) throws Exception {
-//		int checkCount = habitTrackerService.unCheckHabit(habitHistorytDto);
-//		
-//		if (checkCount != 1) {
-//			return ResponseEntity.status(HttpStatus.OK).body(checkCount);
-//		} else {
-//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(checkCount);
-//		}
-//	}
-//	
+	
 	// 월 변경 후 목록 조회
 	@GetMapping("/api/habit/{registDt}")
 	public ResponseEntity<List<HabitDto>> openHabitListByMonth(@PathVariable("registDt") String registDt) throws Exception {
@@ -133,4 +128,21 @@ public class HabitTrackerApiController {
 			return ResponseEntity.status(HttpStatus.OK).body(null);
 		}
 	}
+	
+	// 차트 
+	@GetMapping("/api/habit/chart/{registDt}")
+	public ResponseEntity<Map<String, Object>> habitOneDayAvgPercent(@PathVariable("registDt") String registDt) throws Exception {
+		Map<String, Object> result = new HashMap<>();
+		
+		List<AveragePercentDto> list = habitTrackerService.habitOneDayAvgPercent(registDt);
+		
+		result.put("average",list);
+		
+		if(list != null) {
+			return ResponseEntity.status(HttpStatus.OK).body(result);
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+	}
+	
 }

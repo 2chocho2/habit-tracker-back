@@ -6,6 +6,7 @@ import lombok.Data;
 public class HabitHistoryDto {
 
 	private int habitIdx;
-	private String dontDt;
+	private String doneDt;
+	private String doneYn;
 	
 }
